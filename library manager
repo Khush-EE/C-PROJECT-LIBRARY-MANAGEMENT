@@ -1,0 +1,169 @@
+#include <stdio.h>
+#include <string.h>
+
+struct lender
+{
+    char name[20];
+    char book[20];
+};
+
+int greet()
+{
+    printf("Welcome To Library Management System. Press : \n1. Add A Book\n2. Borrow A Book\n3. Delete A Book\n4. Return A Book\n5. Display Books\n6. Exit\n");
+    int inp;
+    scanf("%d", &inp);
+    return inp;
+}
+
+void add_book(char **books, int* index)
+{
+    printf("Enter The Name Of The Book\n");
+    char book[20];
+    scanf("%s", &book);
+    books[*index] = book;
+    *index++;
+    printf("Book Added Succesfully\n");
+}
+
+void delete_book(char *books[], int index)
+{
+    printf("Enter The Name Of The Book\n");
+    char book[20];
+    scanf("%s", &book);
+    for (int i = 0; i < index+1; i++)
+    {
+        if (strcmp(books[i], book))
+        {
+            books[i] = "null";
+            printf("Book Deleted Succesfully\n");
+            return;
+        }
+    }
+    printf("Sorry The Book Was Not Found. Please Enter The Right Name\n");
+}
+
+void show_library(char *books[], int index)
+{
+    int cnt = 1;
+    for (int i = 0; i < index+1; i++)
+    {
+        if (books[i]=="null")
+        {
+            continue;
+        }
+        printf("%d. %s\n", cnt, books[i]);
+        cnt++;
+    }
+}
+
+int check_lend(struct lender lenders[], int size, char book[])
+{
+    for (int i = 0; i < size; i++)
+    {
+        if (lenders[i].book == book)
+        {
+            // printf("Sorry The Book Is Lend By %s", lenders[i].name);
+            return 0;
+        }
+    }
+    return 1;
+}
+
+void borrow_book(char **books, struct lender *lenders, int size, int* size2)
+{
+    show_library(books, size);
+    printf("Which Book Do You Want To Borrow\n");
+    char book[20];
+    scanf("%s", &book);
+    for (int i = 0; i < size+1; i++)
+    {
+        if (books[i] == book)
+        {
+            if (check_lend(lenders, *size2, book))
+            {
+                printf("Your Name : \n");
+                char name[20];
+                scanf("%s", &name);
+                struct lender lend = {name, book};
+                // lend.name = name;
+                // lend.book = book;
+                lenders[*size2] = lend;
+                *size2++;
+                break;
+            }
+            else
+            {
+                printf("Sorry The Book Is Lend By %s", lenders[i].name);
+                break;
+            }
+        }
+    }
+
+    printf("Book Not Found");
+}
+
+void return_book(char *books[], int index, struct lender lenders[], int ind)
+{
+    printf("Enter The Name Of The Book\n");
+    char book[20];
+    scanf("%s", &book);
+    if (check_lend(lenders, ind, book))
+    {
+        printf("Sorry This Book Does Not Belong To Us\n");
+    }
+    else
+    {
+        printf("Thank You For Returning");
+        for (int i = 0; i < ind+1; i++)
+        {
+            if (lenders[i].book == book)
+            {
+                // lenders[i].name = "null";
+                // lenders[i].book = "null";
+                break;
+            }
+        }
+    }
+}
+
+int main()
+{
+    // char* books[5]={"HC Verma", "MS Chouhan", "RC Mukherjee", "ML Agarwal", "Rich Dad Poor Dad"};
+    char *books[20];
+    books[0] = "HC Verma";
+    // printf("%s", books[1]);
+    struct lender lenders[20];
+    int index = 1;
+    int ind = 0;
+    int flag = 1;
+
+    while (flag)
+    {
+
+        int inp = greet();
+        switch (inp)
+        {
+        case 1:
+            add_book(books, &index);
+            break;
+        case 2:
+            borrow_book(books, lenders, index, &ind);
+            break;
+        case 3:
+            delete_book(books, index);
+            break;
+        case 4:
+            return_book(books, index, lenders, ind);
+            break;
+        case 5:
+            show_library(books, index);
+            break;
+        case 6:
+            flag = 0;
+            break;
+        default:
+            printf("Please Enter A Valid Input\n");
+        }
+    }
+    return 0 ;
+    }
